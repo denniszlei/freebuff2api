@@ -1,0 +1,28 @@
+# VCS / CI
+.git
+.gitignore
+.github
+
+# Python caches & build artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+wheels/
+
+# Local virtualenvs
+.venv/
+venv/
+
+# Local secrets / env — never bake into the image
+.env
+.env.*
+
+# Not needed inside the image
+tests/
+tool/
+exploitation.js
+LICENSE
+*.md
+.python-version

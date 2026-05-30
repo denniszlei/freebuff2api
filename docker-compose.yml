@@ -1,0 +1,19 @@
+# Run freebuff2api from the prebuilt multi-arch image on GHCR.
+#
+# Usage:
+#   1. cp .env.example .env   # then edit .env (at least set FREEBUFF_TOKEN)
+#   2. docker compose up -d
+#   3. docker compose logs -f
+services:
+  freebuff2api:
+    image: ghcr.io/denniszlei/freebuff2api:latest
+    # To build locally instead of pulling, comment out `image:` above
+    # and uncomment the line below:
+    # build: .
+    container_name: freebuff2api
+    restart: unless-stopped
+    # Honors FREEBUFF_PORT from .env (defaults to 8000).
+    ports:
+      - "${FREEBUFF_PORT:-8000}:${FREEBUFF_PORT:-8000}"
+    env_file:
+      - .env

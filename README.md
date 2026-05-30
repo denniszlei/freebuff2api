@@ -121,6 +121,69 @@ python -m pip install -e .
 python main.py
 ```
 
+## Docker
+
+镜像为多架构（`linux/amd64` + `linux/arm64`），由仓库内的 GitHub Actions
+（`.github/workflows/docker-publish.yml`）在推送到 `main` 或打 `v*` tag 时自动
+构建并发布到 GitHub Container Registry：
+
+```text
+ghcr.io/denniszlei/freebuff2api:latest
+```
+
+> 配置全部通过环境变量传入（变量含义见 `.env.example`），容器内**不需要** `.env` 文件。
+> 若包是 private，`docker pull` / `docker compose up` 前需先 `docker login ghcr.io`；
+> 也可在 GitHub 的 Package 设置里将其改为 public。
+
+### docker run
+
+先准备好 `.env`（至少填 `FREEBUFF_TOKEN`），用 `--env-file` 直接复用：
+
+```bash
+docker run -d \
+  --name freebuff2api \
+  -p 8000:8000 \
+  --env-file .env \
+  --restart unless-stopped \
+  ghcr.io/denniszlei/freebuff2api:latest
+```
+
+或不用 `.env`，直接用 `-e` 传关键变量：
+
+```bash
+docker run -d \
+  --name freebuff2api \
+  -p 8000:8000 \
+  -e FREEBUFF_TOKEN=你的-token \
+  -e FREEBUFF_API_KEY=sk-local \
+  --restart unless-stopped \
+  ghcr.io/denniszlei/freebuff2api:latest
+```
+
+### docker compose
+
+仓库根目录已提供 `docker-compose.yml`：
+
+```bash
+cp .env.example .env   # 编辑 .env，至少填 FREEBUFF_TOKEN
+docker compose up -d
+docker compose logs -f
+```
+
+### 自行构建
+
+不想用 GHCR 镜像时，可本地构建（compose 里把 `image:` 注释掉、`build: .` 打开亦可）：
+
+```bash
+docker build -t freebuff2api .
+docker run -d --name freebuff2api -p 8000:8000 --env-file .env freebuff2api
+```
+
+> 自定义端口：改 `.env` 里的 `FREEBUFF_PORT`，compose 会自动跟随；用 `docker run`
+> 时记得把 `-p` 映射改成同一个端口。
+
+启动后接口同样在 `http://127.0.0.1:8000`，调用方式见下文。
+
 ## 调用示例
 
 ```powershell
